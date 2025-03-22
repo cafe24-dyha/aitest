@@ -98,7 +98,7 @@ function handler(req, res) {
                 case 1:
                     _b.trys.push([1, 10, , 11]);
                     if (!(req.method === "GET")) return [3, 2];
-                    return [2, res.status(200).json({ url: AUTH_URL })];
+                    return [2, res.status(200).json({ authUrl: AUTH_URL })];
                 case 2:
                     if (!(req.method === "POST")) return [3, 9];
                     _a = req.body, code = _a.code, action = _a.action, folderId = _a.folderId, accessToken = _a.accessToken;

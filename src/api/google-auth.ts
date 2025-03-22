@@ -20,20 +20,29 @@ const AUTH_URL = `${API_BASE_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT
 )}`;
 
 async function listFolderContents(accessToken: string, folderId: string) {
+  console.log("Fetching folder contents for:", folderId);
+
   const response = await fetch(
-    `https://www.googleapis.com/drive/v3/files?q='${folderId}' in parents&fields=files(id,name,mimeType,webViewLink)`,
+    `https://www.googleapis.com/drive/v3/files?q='${folderId}' in parents&fields=files(id,name,mimeType,webViewLink,shared)&supportsAllDrives=true&includeItemsFromAllDrives=true`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json",
       },
     }
   );
 
+  console.log("Drive API response status:", response.status);
+  const responseData = await response.json();
+  console.log("Drive API response:", responseData);
+
   if (!response.ok) {
-    throw new Error(`Drive API error: ${await response.text()}`);
+    throw new Error(
+      `Drive API error: ${response.status} - ${JSON.stringify(responseData)}`
+    );
   }
 
-  return response.json();
+  return responseData;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
