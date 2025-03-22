@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Google OAuth Plugin</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #fff;
+      }
+
+      .container {
+        max-width: 100%;
+        margin: 0 auto;
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      h2 {
+        font-size: 18px;
+        margin: 15px 0;
+        color: #333;
+      }
+
+      .auth-button {
+        background-color: #4285f4;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.2s;
+      }
+
+      .auth-button:hover {
+        background-color: #3367d6;
+      }
+
+      .profile-container {
+        margin: 20px 0;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        display: none;
+      }
+
+      .profile-info {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+      }
+
+      .profile-picture {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .profile-details {
+        flex: 1;
+      }
+
+      .profile-details p {
+        margin: 8px 0;
+        color: #555;
+      }
+
+      .logs-container {
+        margin-top: 30px;
+        border-top: 1px solid #eee;
+        padding-top: 20px;
+      }
+
+      .logs {
+        max-height: 300px;
+        overflow-y: auto;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        padding: 10px;
+      }
+
+      .log-entry {
+        margin-bottom: 10px;
+        padding: 10px;
+        background-color: white;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .log-timestamp {
+        font-size: 12px;
+        color: #666;
+      }
+
+      .log-stage {
+        font-weight: bold;
+        margin: 5px 0;
+      }
+
+      .log-status {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 12px;
+        margin: 5px 0;
+      }
+
+      .log-success .log-status {
+        background-color: #d4edda;
+        color: #155724;
+      }
+
+      .log-error .log-status {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+
+      .log-start .log-status {
+        background-color: #cce5ff;
+        color: #004085;
+      }
+
+      .log-details,
+      .log-error {
+        font-family: monospace;
+        font-size: 12px;
+        background-color: #f8f9fa;
+        padding: 8px;
+        border-radius: 3px;
+        margin-top: 5px;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Google OAuth Plugin</h1>
+
+      <button id="authButton" class="auth-button">Sign in with Google</button>
+
+      <div id="profileContainer" class="profile-container">
+        <h2>User Profile</h2>
+        <div class="profile-info">
+          <img
+            id="profilePicture"
+            class="profile-picture"
+            style="display: none"
+            alt="Profile"
+          />
+          <div class="profile-details">
+            <p><strong>Name:</strong> <span id="profileName"></span></p>
+            <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+            <p><strong>Locale:</strong> <span id="profileLocale"></span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="logs-container">
+        <h2>Authentication Logs</h2>
+        <div id="logs" class="logs"></div>
+      </div>
+    </div>
+
+    <script>
+      // UI 요소
+      const authButton = document.getElementById("authButton");
+      const profileContainer = document.getElementById("profileContainer");
+      const profilePicture = document.getElementById("profilePicture");
+      const profileName = document.getElementById("profileName");
+      const profileEmail = document.getElementById("profileEmail");
+      const profileLocale = document.getElementById("profileLocale");
+      const logsContainer = document.getElementById("logs");
+
+      // 로그 추가 함수
+      function addLog(entry) {
+        const logEntry = document.createElement("div");
+        logEntry.className = `log-entry log-${entry.status}`;
+
+        logEntry.innerHTML = `
+          <div class="log-timestamp">${entry.timestamp}</div>
+          <div class="log-stage">${entry.stage}</div>
+          <div class="log-status">${entry.status}</div>
+          ${
+            entry.details
+              ? `<pre class="log-details">${JSON.stringify(
+                  entry.details,
+                  null,
+                  2
+                )}</pre>`
+              : ""
+          }
+          ${
+            entry.error
+              ? `<pre class="log-error">${JSON.stringify(
+                  entry.error,
+                  null,
+                  2
+                )}</pre>`
+              : ""
+          }
+        `;
+
+        logsContainer.appendChild(logEntry);
+        logsContainer.scrollTop = logsContainer.scrollHeight;
+      }
+
+      // 프로필 정보 표시 함수
+      function displayProfile(profile) {
+        profileContainer.style.display = "block";
+        authButton.style.display = "none";
+
+        if (profile.picture) {
+          profilePicture.src = profile.picture;
+          profilePicture.style.display = "block";
+        }
+
+        profileName.textContent = profile.name || "N/A";
+        profileEmail.textContent = profile.email || "N/A";
+        profileLocale.textContent = profile.locale || "N/A";
+      }
+
+      // 이벤트 리스너
+      authButton.addEventListener("click", () => {
+        parent.postMessage({ pluginMessage: { type: "start-auth" } }, "*");
+      });
+
+      // 메시지 수신 처리
+      window.onmessage = (event) => {
+        const message = event.data.pluginMessage;
+
+        if (!message) return;
+
+        switch (message.type) {
+          case "log":
+            addLog(message.entry);
+            break;
+
+          case "profile-loaded":
+            displayProfile(message.profile);
+            break;
+
+          case "open-url":
+            window.open(message.url, "oauth-popup", "width=600,height=600");
+            break;
+        }
+      };
+
+      // UI 준비 완료 알림
+      parent.postMessage({ pluginMessage: { type: "ui-ready" } }, "*");
+    </script>
+  </body>
+</html>

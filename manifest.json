@@ -1,0 +1,17 @@
+{
+  "name": "Google OAuth Plugin",
+  "id": "1234567890",
+  "api": "1.0.0",
+  "main": "src/code.js",
+  "ui": "src/ui.html",
+  "editorType": ["figma"],
+  "networkAccess": {
+    "allowedDomains": [
+      "https://*.vercel.app/",
+      "https://accounts.google.com",
+      "https://www.googleapis.com",
+      "https://oauth2.googleapis.com"
+    ],
+    "reasoning": "구글 인증 및 API 호출을 위해 필요한 도메인들입니다."
+  }
+}

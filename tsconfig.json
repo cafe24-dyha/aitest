@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs", // "none" 대신 "commonjs"로 변경
+    "lib": ["es6", "dom"],
+    "moduleResolution": "node",
+    "strict": false,
+    "typeRoots": ["./node_modules/@types", "./node_modules/@figma"],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./src",
+    "noImplicitAny": false,
+    "importHelpers": false,
+    "noEmitOnError": false,
+    "removeComments": true,
+    "allowJs": true,
+    "checkJs": false,
+    "isolatedModules": false
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}
