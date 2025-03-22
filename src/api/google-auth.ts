@@ -59,7 +59,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     if (req.method === "GET") {
       // Return the authorization URL
-      return res.status(200).json({ url: AUTH_URL });
+      return res.status(200).json({ authUrl: AUTH_URL });
     } else if (req.method === "POST") {
       const { code, action, folderId, accessToken } = req.body;
 

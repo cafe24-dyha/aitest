@@ -377,7 +377,7 @@
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ code }),
+            body: JSON.stringify({ code, action: "token" }),
           });
 
           if (!response.ok) {
@@ -386,6 +386,10 @@
           }
 
           const data = await response.json();
+
+          if (!data.access_token) {
+            throw new Error("No access token received");
+          }
 
           // 성공 메시지 전송
           await sendMessageToParent({
